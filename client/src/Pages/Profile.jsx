@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import {getStorage, uploadBytesResumable,ref, getDownloadURL} from 'firebase/storage'
 import {app} from '../firebase';
 import { useDispatch } from 'react-redux';
-import { updateUserStart,updateUserFailure, updateUserSuccess } from '../redux/User/userSlice';
+import { updateUserStart,updateUserFailure, updateUserSuccess, deleteUserStart,deleteUserSuccess,deleteUserFailure } from '../redux/User/userSlice';
 
 
 export default function Profile() {
@@ -18,9 +18,6 @@ export default function Profile() {
   const [updateSuccess,setuodateSuccess]=useState(false)
 
  
-
-  console.log(imagePercent)
-    console.log(image)
     const {currentUser,loading,error}=useSelector((state)=>state.user)
     useEffect(()=>{
       if(image){
@@ -58,6 +55,8 @@ export default function Profile() {
     setFormData({...formData,[e.target.id]:e.target.value})
   }
 
+
+
   const handleSubmit=async(e)=>{
     e.preventDefault();
     try{
@@ -80,6 +79,27 @@ export default function Profile() {
       dispatch(updateUserFailure(error));
     }
   };
+
+
+
+  const handledeleteAccount =async ()=>{
+    try{
+      dispatch(deleteUserStart())
+        const res=await fetch(`/api/user/delete/${currentUser._id}`,{
+
+        method:'DELETE',
+        })
+        const data=await res.json();
+        if(data.success===false){
+          dispatch(deleteUserFailure(data))
+          return;
+        }
+        dispatch(deleteUserSuccess(data))
+        alert('user deleted successfully')
+    }catch(error){
+        dispatch(deleteUserFailure(error))
+    }
+  }
   return (
 
     <div className='p-3 max-w-lg mx-auto'>
@@ -116,11 +136,11 @@ export default function Profile() {
 
       </form>
       <div className='flex justify-between mt-5'>
-<span className='text-red-700 cursor-pointer'>Delete Account</span>
-<span className='text-red-700 cursor-pointer'>Sign Out</span>
+        <span onClick={handledeleteAccount} className='text-red-700 cursor-pointer'>Delete Account</span>
+        <span className='text-red-700 cursor-pointer'>Sign Out</span>
       </div>
-        <p className='text-red-700 mt-5'>{error && 'something went wrong'}</p>
-        <p className='text-green-700 mt-5'>{updateSuccess  && 'user is updated successfully'}</p>
+        <p className='text-red-700 mt-5'>{error && 'Something went wrong'}</p>
+        <p className='text-green-700 mt-5'>{updateSuccess  && 'user  updated successfully'}</p>
      
     </div>
   )

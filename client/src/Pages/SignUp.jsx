@@ -7,6 +7,7 @@ export default function SignUp() {
   const [error,setError]=useState(false);
   const [loading,setLoading]=useState(false);
   const navigate=useNavigate();
+  
   const handleChange=(e)=>{
     setFormdata({...formdata,[e.target.id]:e.target.value})
   }
